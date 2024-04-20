@@ -30,18 +30,18 @@ void File::read_file()
 
 void File::print_processes_params()
 {
-	vector<ProcessParams *>::iterator iter = processes.begin();
+	// vector<ProcessParams *>::iterator iter = File::processes.begin();
 
-	for (iter; iter < processes.end(); iter++)
-	{
-		ProcessParams *p = *iter;
-		cout << *p;
-	}
+	// for (iter; iter < File::processes.end(); iter++)
+	// {
+	// 	ProcessParams *p = *iter;
+	// 	cout << *p;
+	// }
 }
 
 File::~File()
 {
-	for (int i = 0; i < processes.size(); i++)
+	for (size_t i = 0; i < File::processes.size(); i++)
 	{
 		ProcessParams *p = processes[i];
 		delete p;

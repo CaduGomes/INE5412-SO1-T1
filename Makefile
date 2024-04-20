@@ -1,17 +1,15 @@
 CC = g++
-CFLAGS = -Wall -Wextra -std=c++11
+
+CFLAGS = -Wall -g
+
 SRCS = *.cpp
-HDRS = *.hpp
-OBJS = $(SRCS:.cpp=.o)
-OUT = out
 
-all: $(OUT)
+TARGET = main
 
-$(OUT): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(OUT)
+all: clean $(TARGET) 
 
-%.o: %.cpp $(HDRS)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(TARGET): $(SRCS)
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET) $(SRCS)
 
 clean:
-	rm -f $(OBJS) $(OUT)
+	$(RM) $(TARGET)
