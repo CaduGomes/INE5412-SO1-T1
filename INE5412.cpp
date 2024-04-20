@@ -3,21 +3,30 @@
 
 INE5412::INE5412(Algorithm *algorithm, vector<ProcessParams *> processes)
 {
-    INE5412::algorithm = algorithm;
-    INE5412::stack_pointer = processes;
+    this->algorithm = algorithm;
+    this->stack_pointer = processes;
 }
 
 INE5412::~INE5412()
 {
-    delete INE5412::algorithm;
-    vector<ProcessParams *>::iterator iter = INE5412::stack_pointer.begin();
-    for (iter = INE5412::stack_pointer.begin(); iter < INE5412::stack_pointer.end(); iter++)
+    delete this->algorithm;
+    vector<ProcessParams *>::iterator iter = this->stack_pointer.begin();
+    for (iter = this->stack_pointer.begin(); iter < this->stack_pointer.end(); iter++)
     {
         delete *iter;
     }
+
+    this->stack_pointer.clear();
+
+    if (this->program_counter != nullptr)
+    {
+        delete this->program_counter;
+    }
+
+    cout << "Context switches: " << this->context_switches << endl;
 }
 
-void INE5412::check_process_status()
+void INE5412::check_processes_status()
 {
     vector<ProcessParams *>::iterator iter = this->stack_pointer.begin();
 
@@ -33,59 +42,81 @@ void INE5412::check_process_status()
     }
 }
 
+void INE5412::check_processes_deadline()
+{
+    vector<ProcessParams *>::iterator iter = this->stack_pointer.begin();
+
+    for (iter = this->stack_pointer.begin(); iter < stack_pointer.end(); iter++)
+    {
+        ProcessParams *p = *iter;
+        if (p->get_deadline_time() == this->current_time && p->get_status() != "finished")
+        {
+            cout << "Process " << p->get_id() << " missed deadline" << endl;
+            p->set_status("finished");
+        }
+    }
+}
+
+bool INE5412::should_finish()
+{
+    bool all_processes_finished = true;
+    for (ProcessParams *p : this->stack_pointer)
+    {
+        if (p->get_status() != "finished")
+        {
+            all_processes_finished = false;
+            break;
+        }
+    }
+
+    return all_processes_finished;
+}
+
 void INE5412::start()
 {
     while (true)
     {
-        bool all_processes_finished = true;
+
         for (ProcessParams *p : this->stack_pointer)
         {
             cout << *p;
-            if (p->get_status() != "finished")
-            {
-                all_processes_finished = false;
-                        }
         }
 
-        if (all_processes_finished)
+        cout << "Current time: " << this->current_time << endl;
+
+        if (this->should_finish())
         {
             cout << "All processes finished" << endl;
             break;
         }
 
-        cout << "Current time: " << this->current_time << endl;
-        if (this->program_counter != NULL)
+        this->check_processes_status();
+        this->check_processes_deadline();
+
+        ProcessParams *current_process = this->algorithm->select_process(this->stack_pointer);
+
+        if (current_process == nullptr && this->program_counter->get_status() == "finished")
         {
-            cout << "Current process: " << this->program_counter->get_id() << endl;
+            cout << "No process to run" << endl;
+            this->current_time++;
+            sleep(1);
+            continue;
         }
 
-        this->check_process_status();
-
-        this->program_counter;
-
-        if (this->program_counter == NULL)
+        if (this->program_counter == nullptr || this->program_counter->get_status() == "finished")
         {
-            this->program_counter = this->algorithm->select_process(this->stack_pointer);
+            this->program_counter = current_process;
+        }
+        else if (current_process != nullptr && this->program_counter->get_priority() < current_process->get_priority())
+        {
 
-            if (this->program_counter == NULL)
-            {
-                cout << "No process selected" << endl;
-                this->current_time++;
-                sleep(1);
-                continue;
-            }
+            this->program_counter->set_status("ready");
+            cout << "Context switched" << endl;
+            this->context_switches++;
+            this->program_counter = current_process;
         }
 
-        this->program_counter->set_status("running");
-        cout << "Running process " << this->program_counter->get_id() << endl;
-
-        bool isProcessFinished = this->program_counter->is_finished(this->current_time);
-
-        if (isProcessFinished)
-        {
-            cout << "Process " << this->program_counter->get_id() << " finished" << endl;
-            this->program_counter = NULL;
-        }
+        this->program_counter->run(this->current_time);
 
         this->current_time++;
         sleep(1);

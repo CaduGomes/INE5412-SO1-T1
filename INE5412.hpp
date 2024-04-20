@@ -16,16 +16,21 @@ public:
 
     void start();
 
-    void check_process_status();
+    void check_processes_status();
+
+    bool should_finish();
+
+    void check_processes_deadline();
 
     ~INE5412();
 
 private:
     vector<ProcessParams *> stack_pointer;
-    ProcessParams *program_counter;
+    ProcessParams *program_counter = nullptr;
     string status; // "new" | "ready" | "running" | "finished" | "blocked"
     Algorithm *algorithm;
     int current_time = 0;
+    int context_switches = 0;
 };
 
 #endif
