@@ -12,14 +12,11 @@ class File
 {
 
 public:
-    void read_file();
-    void print_processes_params();
-    File();  // This is the constructor declaration
-    ~File(); // This is the destructor: declaration
+    vector<ProcessParams *> read_file();
+    File();
 
 private:
     ifstream myfile;
-    vector<ProcessParams *> processes;
 };
 
 #endif

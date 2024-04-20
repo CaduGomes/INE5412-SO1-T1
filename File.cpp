@@ -9,41 +9,24 @@ File::File()
 	}
 }
 
-void File::read_file()
+vector<ProcessParams *> File::read_file()
 {
-
-	int a, b, c;
+	int creation_time, duration, period, priority, deadline, period_quantity;
 
 	if (!myfile.is_open())
 	{
 		cout << "Arquivo não está aberto!" << endl;
 	}
 
-	while (myfile >> a >> b >> c)
+	vector<ProcessParams *> processes;
+	while (myfile >> creation_time >> duration >> period >> deadline >> priority >> period_quantity)
 	{
-		ProcessParams *p = new ProcessParams(a, b, c);
+		ProcessParams *p = new ProcessParams(creation_time, duration, period, deadline, priority, period_quantity);
+		p->set_id(processes.size() + 1);
 		processes.push_back(p);
 	}
 
 	cout << "Quantidade de processos lidos do arquivo: " << processes.size() << endl;
-}
 
-void File::print_processes_params()
-{
-	// vector<ProcessParams *>::iterator iter = File::processes.begin();
-
-	// for (iter; iter < File::processes.end(); iter++)
-	// {
-	// 	ProcessParams *p = *iter;
-	// 	cout << *p;
-	// }
-}
-
-File::~File()
-{
-	for (size_t i = 0; i < File::processes.size(); i++)
-	{
-		ProcessParams *p = processes[i];
-		delete p;
-	}
+	return processes;
 }
