@@ -9,7 +9,7 @@ class ProcessParams
 public:
     friend ostream &operator<<(ostream &os, const ProcessParams &p)
     {
-        os << "Id = " << p.id << " creation time = " << p.creation_time << " duration = " << p.duration_time << " priority = " << p.priority << " period = " << p.period << " deadline = " << p.deadline_time << " period_quantity = " << p.period_quantity << endl;
+        os << "Id = " << p.id << " status = " << p.status << " creation time = " << p.creation_time << " duration = " << p.duration_time << " priority = " << p.priority << " period = " << p.period << " deadline = " << p.deadline_time << " period_quantity = " << p.period_quantity << endl;
         return os;
     }
 
@@ -46,6 +46,7 @@ public:
 
     bool is_finished(int current_time)
     {
+        total_time++;
 
         if (status == "finished")
         {
@@ -64,7 +65,6 @@ public:
             return true;
         }
 
-        total_time++;
         return false;
     }
 

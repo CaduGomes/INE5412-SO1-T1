@@ -40,11 +40,11 @@ void INE5412::start()
         bool all_processes_finished = true;
         for (ProcessParams *p : this->stack_pointer)
         {
+            cout << *p;
             if (p->get_status() != "finished")
             {
                 all_processes_finished = false;
-                break;
-            }
+                        }
         }
 
         if (all_processes_finished)
@@ -54,16 +54,20 @@ void INE5412::start()
         }
 
         cout << "Current time: " << this->current_time << endl;
+        if (this->program_counter != NULL)
+        {
+            cout << "Current process: " << this->program_counter->get_id() << endl;
+        }
 
         this->check_process_status();
 
-        ProcessParams *current_process = this->program_counter;
+        this->program_counter;
 
-        if (current_process == NULL)
+        if (this->program_counter == NULL)
         {
-            current_process = this->algorithm->select_process(this->stack_pointer);
+            this->program_counter = this->algorithm->select_process(this->stack_pointer);
 
-            if (current_process == NULL)
+            if (this->program_counter == NULL)
             {
                 cout << "No process selected" << endl;
                 this->current_time++;
@@ -72,14 +76,14 @@ void INE5412::start()
             }
         }
 
-        current_process->set_status("running");
-        cout << "Running process " << current_process->get_id() << endl;
+        this->program_counter->set_status("running");
+        cout << "Running process " << this->program_counter->get_id() << endl;
 
-        bool isProcessFinished = current_process->is_finished(this->current_time);
+        bool isProcessFinished = this->program_counter->is_finished(this->current_time);
 
         if (isProcessFinished)
         {
-            cout << "Process " << current_process->get_id() << " finished" << endl;
+            cout << "Process " << this->program_counter->get_id() << " finished" << endl;
             this->program_counter = NULL;
         }
 

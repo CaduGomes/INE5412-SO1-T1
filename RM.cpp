@@ -6,7 +6,7 @@ ProcessParams *RM::select_process(vector<ProcessParams *> processes)
     size_t index_of_priority_process = -1;
     int highest_priority = 0;
 
-    for (size_t i = 1; i < processes.size(); i++)
+    for (size_t i = 0; i < processes.size(); i++)
     {
         ProcessParams *process = processes[i];
 
