@@ -16,6 +16,8 @@ public:
 
     ProcessParams(int creation_time, int duration_time, int period_time, int priority, int deadline, int period_quantity);
 
+    ProcessParams(ProcessParams p, int creation_time, int deadline_time); // clone process
+
     void set_id(int id);
 
     int get_id() { return id; }
@@ -30,17 +32,19 @@ public:
 
     int get_period_quantity() { return period_quantity; }
 
-    int get_finish_time() { return finish_time; }
-
-    int get_total_time() { return total_time; }
-
     int get_duration_time() { return duration_time; }
 
-    void set_finish_time(int finish_time) { this->finish_time = finish_time; }
+    int get_turnaround_time() { return finish_time - creation_time; }
 
-    void set_total_time(int total_time) { this->total_time = total_time; }
+    bool was_preemptive() { return finish_time == deadline_time; }
+
+    int get_waiting_time() { return waiting_time; }
+
+    void add_wait_time() { waiting_time++; }
 
     void set_status(string status) { this->status = status; }
+
+    void set_finish_time(int finish_time) { this->finish_time = finish_time; }
 
     bool is_ready();
 
@@ -60,6 +64,8 @@ private:
     int start_time = -1; // o momento em que o processo mudou para running
 
     int total_time = 0; // o tempo total que o processo levou para terminar
+
+    int waiting_time = 0; // o tempo que o processo esperou para ser executado
 
     int priority;
     int period_quantity;

@@ -21,7 +21,7 @@ vector<ProcessParams *> File::read_file()
 	vector<ProcessParams *> processes;
 	while (myfile >> creation_time >> duration >> period >> deadline >> priority >> period_quantity)
 	{
-		ProcessParams *p = new ProcessParams(creation_time, duration, period, deadline, priority, period_quantity);
+		ProcessParams *p = new ProcessParams(creation_time, duration, period, creation_time + deadline, priority, period_quantity);
 		p->set_id(processes.size() + 1);
 		processes.push_back(p);
 	}

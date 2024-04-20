@@ -22,6 +22,8 @@ public:
 
     void check_processes_deadline();
 
+    void check_waiting_time();
+
     ~INE5412();
 
 private:

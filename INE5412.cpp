@@ -7,10 +7,39 @@ INE5412::INE5412(Algorithm *algorithm, vector<ProcessParams *> processes)
     this->stack_pointer = processes;
 }
 
+struct Data
+{
+    int id;
+    int turnaround_time;
+    int media_espera;
+    int deadlines;
+    int count;
+};
+
 INE5412::~INE5412()
 {
-    delete this->algorithm;
-    vector<ProcessParams *>::iterator iter = this->stack_pointer.begin();
+    cout << "=----------------------------------= Processos =------------------------------------=" << endl;
+    cout << "| ID | Turnaround Time  |  Turnaround Time Médio |  Média espera |  Total deadlines |" << endl;
+
+    vector<Data> data = vector<Data>(this->stack_pointer.size() + 1, {0, 0, 0, 0, 0});
+
+    for (ProcessParams *p : this->stack_pointer)
+    {
+        data[p->get_id()].turnaround_time = p->get_turnaround_time();
+        data[p->get_id()].media_espera += p->get_waiting_time();
+        data[p->get_id()].deadlines += p->was_preemptive() ? 1 : 0;
+        data[p->get_id()].count++;
+    }
+
+    for (ProcessParams *p : this->stack_pointer)
+    {
+        cout << "| P" << p->get_id() << " |         " << p->get_turnaround_time() << "        |            " << data[p->get_id()].turnaround_time << "         |        " << data[p->get_id()].media_espera / data[p->get_id()].count << "          |      " << data[p->get_id()].deadlines << "     |" << endl;
+    }
+
+    cout << "=-----------------------------------------------------------------------------------=" << endl;
+    cout << "Núm. total de trocas de contexto: " << this->context_switches << endl;
+
+        vector<ProcessParams *>::iterator iter = this->stack_pointer.begin();
     for (iter = this->stack_pointer.begin(); iter < this->stack_pointer.end(); iter++)
     {
         delete *iter;
@@ -22,8 +51,6 @@ INE5412::~INE5412()
     {
         delete this->program_counter;
     }
-
-    cout << "Context switches: " << this->context_switches << endl;
 }
 
 void INE5412::check_processes_status()
@@ -34,10 +61,26 @@ void INE5412::check_processes_status()
     for (iter = this->stack_pointer.begin(); iter < stack_pointer.end(); iter++)
     {
         ProcessParams *p = *iter;
+
         if (p->get_creation_time() == this->current_time && p->get_status() == "new")
         {
             p->set_status("ready");
             cout << "Process " << p->get_id() << " is ready" << endl;
+        }
+    }
+}
+
+void INE5412::check_waiting_time()
+{
+    vector<ProcessParams *>::iterator iter = this->stack_pointer.begin();
+
+    // Se o creation_time do processo for igual ao current_time e o status for "new", muda o status para "ready"
+    for (iter = this->stack_pointer.begin(); iter < stack_pointer.end(); iter++)
+    {
+        ProcessParams *p = *iter;
+        if (p->get_status() == "ready")
+        {
+            p->add_wait_time();
         }
     }
 }
@@ -52,6 +95,7 @@ void INE5412::check_processes_deadline()
         if (p->get_deadline_time() == this->current_time && p->get_status() != "finished")
         {
             cout << "Process " << p->get_id() << " missed deadline" << endl;
+            p->set_finish_time(this->current_time);
             p->set_status("finished");
         }
     }
@@ -95,10 +139,11 @@ void INE5412::start()
 
         ProcessParams *current_process = this->algorithm->select_process(this->stack_pointer);
 
-        if (current_process == nullptr && this->program_counter->get_status() == "finished")
+        if (current_process == nullptr && (this->program_counter == nullptr || this->program_counter->get_status() == "finished"))
         {
             cout << "No process to run" << endl;
             this->current_time++;
+            this->check_waiting_time();
             sleep(1);
             continue;
         }
@@ -119,6 +164,8 @@ void INE5412::start()
         this->program_counter->run(this->current_time);
 
         this->current_time++;
+
+        this->check_waiting_time();
         sleep(1);
 
         cout << "--------------------------------------------" << endl;
