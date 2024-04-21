@@ -25,6 +25,18 @@ ProcessParams::ProcessParams(ProcessParams p, int creation_time, int deadline_ti
     ProcessParams::id = p.id;
 }
 
+ProcessParams::ProcessParams(ProcessParams *p)
+{
+    ProcessParams::creation_time = p->creation_time;
+    ProcessParams::duration_time = p->duration_time;
+    ProcessParams::period_time = p->period_time;
+    ProcessParams::deadline_time = p->deadline_time;
+    ProcessParams::priority = p->priority;
+    ProcessParams::period_quantity = p->period_quantity;
+    ProcessParams::status = p->status;
+    ProcessParams::id = p->id;
+}
+
 void ProcessParams::set_id(int id)
 {
     ProcessParams::id = id;
@@ -41,8 +53,6 @@ bool ProcessParams::is_ready()
 
 void ProcessParams::run(int current_time)
 {
-
-    cout << "Current process: " << id << endl;
     total_time++;
 
     if (start_time == -1)
@@ -54,7 +64,6 @@ void ProcessParams::run(int current_time)
     {
         status = "finished";
         finish_time = current_time;
-        cout << "Process " << id << " missed deadline" << endl;
         return;
     }
 
@@ -62,7 +71,6 @@ void ProcessParams::run(int current_time)
     {
         status = "finished";
         finish_time = current_time;
-        cout << "Process " << id << " finished" << endl;
         return;
     }
 

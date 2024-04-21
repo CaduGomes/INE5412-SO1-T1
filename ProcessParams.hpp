@@ -16,7 +16,8 @@ public:
 
     ProcessParams(int creation_time, int duration_time, int period_time, int priority, int deadline, int period_quantity);
 
-    ProcessParams(ProcessParams p, int creation_time, int deadline_time); // clone process
+    ProcessParams(ProcessParams p, int creation_time, int deadline_time);
+    ProcessParams(ProcessParams *p);
 
     void set_id(int id);
 
@@ -31,8 +32,6 @@ public:
     int get_priority() { return priority; }
 
     int get_period_quantity() { return period_quantity; }
-
-    int get_duration_time() { return duration_time; }
 
     int get_turnaround_time() { return finish_time - creation_time; }
 

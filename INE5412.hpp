@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <set>
 
 #include "Algorithm.hpp"
 
@@ -15,12 +16,9 @@ public:
     INE5412(Algorithm *algorithm, vector<ProcessParams *> processes);
 
     void start();
-
     void check_processes_status();
 
     bool should_finish();
-
-    void check_processes_deadline();
 
     void check_waiting_time();
 
@@ -33,6 +31,7 @@ private:
     Algorithm *algorithm;
     int current_time = 0;
     int context_switches = 0;
+    std::set<int> processesIds;
 };
 
 #endif

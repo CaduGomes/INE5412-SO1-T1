@@ -9,11 +9,11 @@ int main()
 {
 	File file;
 
-	vector<ProcessParams *> processes = file.read_file();
+	vector<ProcessParams *> original_process = file.read_file();
 
 	vector<ProcessParams *> processes_copy;
 
-	for (ProcessParams *process : processes)
+	for (ProcessParams *process : original_process)
 	{
 
 		for (int i = 1; i < process->get_period_quantity(); i++)
@@ -33,7 +33,7 @@ int main()
 			else
 			{
 
-				int new_creation_time = processes[processes.size() - 1]->get_creation_time() + process->get_period_time();
+				int new_creation_time = original_process[original_process.size() - 1]->get_creation_time() + process->get_period_time();
 
 				int new_deadline_time = new_creation_time + process->get_period_time();
 
@@ -46,16 +46,23 @@ int main()
 
 	for (ProcessParams *process : processes_copy)
 	{
-		processes.push_back(process);
+		original_process.push_back(process);
 	}
 
 	RM *rm = new RM();
 
-	INE5412 *cpu = new INE5412(rm, processes);
+	vector<ProcessParams *> process_copy_for_rm;
 
-	cpu->start();
+	for (ProcessParams *obj : original_process)
+	{
+		process_copy_for_rm.push_back(new ProcessParams(*obj));
+	}
 
-	delete cpu;
+	INE5412 *rm_cpu = new INE5412(rm, process_copy_for_rm);
+
+	rm_cpu->start();
+
+	delete rm_cpu;
 
 	delete rm;
 
@@ -65,11 +72,18 @@ int main()
 
 	EDF *edf = new EDF();
 
-	cpu = new INE5412(edf, processes);
+	vector<ProcessParams *> process_copy_for_edf;
 
-	cpu->start();
+	for (ProcessParams *obj : original_process)
+	{
+		process_copy_for_edf.push_back(new ProcessParams(*obj));
+	}
 
-	delete cpu;
+	INE5412 *edf_cpu = new INE5412(edf, process_copy_for_edf);
+
+	edf_cpu->start();
+
+	delete edf_cpu;
 	delete edf;
 
 	cout << "Fim da execução do EDF" << endl;
