@@ -13,8 +13,7 @@ class RM : public Algorithm
 
 public:
     ProcessParams *select_process(vector<ProcessParams *> processes);
-
-private:
+    int compare_and_return_priority_id(ProcessParams *p1, ProcessParams *p2);
 };
 
 #endif

@@ -27,3 +27,13 @@ ProcessParams *RM::select_process(vector<ProcessParams *> processes)
 
     return processes[index_of_priority_process];
 }
+
+int RM::compare_and_return_priority_id(ProcessParams *p1, ProcessParams *p2)
+{
+    if (p1->get_priority() > p2->get_priority())
+    {
+        return p1->get_id();
+    }
+
+    return p2->get_id();
+}

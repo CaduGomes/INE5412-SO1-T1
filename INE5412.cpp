@@ -29,17 +29,23 @@ INE5412::~INE5412()
         data[p->get_id()].media_espera += p->get_waiting_time();
         data[p->get_id()].deadlines += p->was_preemptive() ? 1 : 0;
         data[p->get_id()].count++;
+        // data
     }
 
     for (ProcessParams *p : this->stack_pointer)
     {
-        cout << "| P" << p->get_id() << " |         " << p->get_turnaround_time() << "        |            " << data[p->get_id()].turnaround_time << "         |        " << data[p->get_id()].media_espera / data[p->get_id()].count << "          |      " << data[p->get_id()].deadlines << "     |" << endl;
+        double media_espera = data[p->get_id()].media_espera / data[p->get_id()].count;
+        double turnaround_time = data[p->get_id()].turnaround_time / data[p->get_id()].count;
+
+        cout << data[p->get_id()].count << endl;
+
+        cout << "| P" << p->get_id() << " |         " << p->get_turnaround_time() << "        |            " << turnaround_time << "         |        " << media_espera << "          |      " << data[p->get_id()].deadlines << "     |" << endl;
     }
 
     cout << "=-----------------------------------------------------------------------------------=" << endl;
     cout << "Núm. total de trocas de contexto: " << this->context_switches << endl;
 
-        vector<ProcessParams *>::iterator iter = this->stack_pointer.begin();
+    vector<ProcessParams *>::iterator iter = this->stack_pointer.begin();
     for (iter = this->stack_pointer.begin(); iter < this->stack_pointer.end(); iter++)
     {
         delete *iter;
@@ -152,13 +158,18 @@ void INE5412::start()
         {
             this->program_counter = current_process;
         }
-        else if (current_process != nullptr && this->program_counter->get_priority() < current_process->get_priority())
+        else if (current_process != nullptr)
         {
+            int result_priority = this->algorithm->compare_and_return_priority_id(this->program_counter, current_process);
 
-            this->program_counter->set_status("ready");
-            cout << "Context switched" << endl;
-            this->context_switches++;
-            this->program_counter = current_process;
+            if (result_priority == current_process->get_id()) // deve alterar o processo em execução
+            {
+
+                this->program_counter->set_status("ready");
+                cout << "Context switched" << endl;
+                this->context_switches++;
+                this->program_counter = current_process;
+            }
         }
 
         this->program_counter->run(this->current_time);
