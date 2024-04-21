@@ -30,7 +30,7 @@ ProcessParams *RM::select_process(vector<ProcessParams *> processes)
 
 int RM::compare_and_return_priority_id(ProcessParams *p1, ProcessParams *p2)
 {
-    if (p1->get_priority() > p2->get_priority())
+    if (p1->get_priority() >= p2->get_priority())
     {
         return p1->get_id();
     }

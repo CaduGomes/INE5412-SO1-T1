@@ -22,6 +22,8 @@ public:
 
     void check_waiting_time();
 
+    void print_processes_status();
+
     ~INE5412();
 
 private:

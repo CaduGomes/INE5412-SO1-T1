@@ -70,7 +70,7 @@ void ProcessParams::run(int current_time)
     if (total_time == duration_time)
     {
         status = "finished";
-        finish_time = current_time;
+        finish_time = current_time + 1;
         return;
     }
 

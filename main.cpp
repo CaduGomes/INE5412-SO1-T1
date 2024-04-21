@@ -3,7 +3,7 @@
 #include "RM.hpp"
 #include "EDF.hpp"
 
-// TODO: diagrama de output, diagrama UML, relatório, registrador, corrigir deletes de ponteiros
+// TODO: diagrama UML, relatório, registrador
 
 int main()
 {
@@ -32,8 +32,7 @@ int main()
 			}
 			else
 			{
-
-				int new_creation_time = original_process[original_process.size() - 1]->get_creation_time() + process->get_period_time();
+				int new_creation_time = processes_copy[processes_copy.size() - 1]->get_creation_time() + process->get_period_time();
 
 				int new_deadline_time = new_creation_time + process->get_period_time();
 
@@ -85,6 +84,11 @@ int main()
 
 	delete edf_cpu;
 	delete edf;
+
+	for (ProcessParams *p : original_process)
+	{
+		delete p;
+	}
 
 	cout << "Fim da execução do EDF" << endl;
 	return 0;
