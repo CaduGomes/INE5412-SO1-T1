@@ -29,7 +29,6 @@ public:
 private:
     vector<ProcessParams *> stack_pointer;
     ProcessParams *program_counter = nullptr;
-    string status; // "new" | "ready" | "running" | "finished" | "blocked"
     Algorithm *algorithm;
     int current_time = 0;
     int context_switches = 0;

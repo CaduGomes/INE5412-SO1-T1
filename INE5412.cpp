@@ -180,17 +180,10 @@ void INE5412::print_processes_status()
         string status = "new";
         for (ProcessParams *p : this->stack_pointer)
         {
-            if (p->get_id() == id)
+            if (p->get_id() == id && p->get_status() == "ready")
             {
 
-                if (p->get_status() == "running")
-                {
-                    status = "running";
-                }
-                else if (p->get_status() == "ready")
-                {
-                    status = "ready";
-                }
+                status = "ready";
             }
         }
 
@@ -201,10 +194,6 @@ void INE5412::print_processes_status()
         else if (status == "new")
         {
             cout << "      ";
-        }
-        else if (status == "running")
-        {
-            cout << "  ##  ";
         }
         else if (status == "ready")
         {

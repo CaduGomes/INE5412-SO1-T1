@@ -12,7 +12,7 @@ class File
 {
 
 public:
-    vector<ProcessParams *> read_file();
+    vector<ProcessParams> read_file();
     File();
 
 private:

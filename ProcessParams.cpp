@@ -13,7 +13,7 @@ ProcessParams::ProcessParams(int creation_time, int duration_time, int period_ti
     ProcessParams::status = "new";
 }
 
-ProcessParams::ProcessParams(ProcessParams p, int creation_time, int deadline_time)
+ProcessParams::ProcessParams(const ProcessParams &p, int creation_time, int deadline_time)
 {
     ProcessParams::creation_time = creation_time;
     ProcessParams::duration_time = p.duration_time;
@@ -25,16 +25,16 @@ ProcessParams::ProcessParams(ProcessParams p, int creation_time, int deadline_ti
     ProcessParams::id = p.id;
 }
 
-ProcessParams::ProcessParams(ProcessParams *p)
+ProcessParams::ProcessParams(const ProcessParams &p)
 {
-    ProcessParams::creation_time = p->creation_time;
-    ProcessParams::duration_time = p->duration_time;
-    ProcessParams::period_time = p->period_time;
-    ProcessParams::deadline_time = p->deadline_time;
-    ProcessParams::priority = p->priority;
-    ProcessParams::period_quantity = p->period_quantity;
-    ProcessParams::status = p->status;
-    ProcessParams::id = p->id;
+    ProcessParams::creation_time = p.creation_time;
+    ProcessParams::duration_time = p.duration_time;
+    ProcessParams::period_time = p.period_time;
+    ProcessParams::deadline_time = p.deadline_time;
+    ProcessParams::priority = p.priority;
+    ProcessParams::period_quantity = p.period_quantity;
+    ProcessParams::status = p.status;
+    ProcessParams::id = p.id;
 }
 
 void ProcessParams::set_id(int id)

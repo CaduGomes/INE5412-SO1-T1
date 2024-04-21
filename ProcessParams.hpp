@@ -16,8 +16,8 @@ public:
 
     ProcessParams(int creation_time, int duration_time, int period_time, int priority, int deadline, int period_quantity);
 
-    ProcessParams(ProcessParams p, int creation_time, int deadline_time);
-    ProcessParams(ProcessParams *p);
+    ProcessParams(const ProcessParams &p, int creation_time, int deadline_time);
+    ProcessParams(const ProcessParams &p);
 
     void set_id(int id);
 
