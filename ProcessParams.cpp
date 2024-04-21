@@ -42,15 +42,6 @@ void ProcessParams::set_id(int id)
     ProcessParams::id = id;
 }
 
-bool ProcessParams::is_ready()
-{
-    if (status == "ready")
-    {
-        return true;
-    }
-    return false;
-}
-
 void ProcessParams::run(int current_time)
 {
     total_time++;
@@ -75,4 +66,83 @@ void ProcessParams::run(int current_time)
     }
 
     status = "running";
+}
+
+int ProcessParams::get_id()
+{
+    return id;
+}
+
+int ProcessParams::get_creation_time()
+{
+    return creation_time;
+}
+
+int ProcessParams::get_deadline_time()
+{
+    return deadline_time;
+}
+
+int ProcessParams::get_period_time()
+{
+    return period_time;
+}
+
+int ProcessParams::get_priority()
+{
+    return priority;
+}
+
+int ProcessParams::get_period_quantity()
+{
+    return period_quantity;
+}
+
+int ProcessParams::get_turnaround_time()
+{
+    return finish_time - creation_time;
+}
+
+bool ProcessParams::was_preemptive()
+{
+    return finish_time == deadline_time;
+}
+
+int ProcessParams::get_waiting_time()
+{
+    return waiting_time;
+}
+
+void ProcessParams::add_wait_time() { waiting_time++; }
+
+void ProcessParams::set_status(string status)
+{
+    this->status = status;
+}
+
+int ProcessParams::get_total_time()
+{
+    return total_time;
+}
+
+void ProcessParams::set_finish_time(int finish_time)
+{
+    this->finish_time = finish_time;
+}
+
+bool ProcessParams::is_ready()
+{
+    return status == "ready";
+}
+bool ProcessParams::is_finished()
+{
+    return status == "finished";
+}
+bool ProcessParams::is_running()
+{
+    return status == "running";
+}
+bool ProcessParams::is_new()
+{
+    return status == "new";
 }

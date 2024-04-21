@@ -24,6 +24,8 @@ public:
 
     void print_processes_status();
 
+    void change_context(ProcessParams *process);
+
     ~INE5412();
 
 private:
@@ -33,6 +35,15 @@ private:
     int current_time = 0;
     int context_switches = 0;
     std::set<int> processesIds;
+};
+
+struct Data
+{
+    int id;
+    double turnaround_time;
+    double media_espera;
+    int deadlines;
+    int count;
 };
 
 #endif

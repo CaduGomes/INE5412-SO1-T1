@@ -24,22 +24,14 @@ INE5412::INE5412(Algorithm *algorithm, vector<ProcessParams *> processes)
     cout << endl;
 }
 
-struct Data
-{
-    int id;
-    double turnaround_time;
-    double media_espera;
-    int deadlines;
-    int count;
-};
-
+// Destrutor da classe INE5412, limpa memória e faz o prints de resultados
 INE5412::~INE5412()
 {
     cout << "=-----------------------------------= Processos =-------------------------------------=" << endl;
     cout << "|  ID  | Turnaround Time | Turnaround Time Médio |  Média espera  |  Total deadlines |" << endl;
 
+    // Cria um vetor de dados para armazenar os resultados dos processos agrupados por ID
     vector<Data> data = vector<Data>(this->stack_pointer.size() + 1, {0, 0, 0, 0, 0});
-
     for (ProcessParams *p : this->stack_pointer)
     {
         data[p->get_id()].turnaround_time += p->get_turnaround_time();
@@ -48,6 +40,7 @@ INE5412::~INE5412()
         data[p->get_id()].count++;
     }
 
+    // Imprime os resultados dos processos, tem vários IFs para printar alinhado
     for (ProcessParams *p : this->stack_pointer)
     {
         double media_espera = data[p->get_id()].media_espera / data[p->get_id()].count;
@@ -104,50 +97,53 @@ INE5412::~INE5412()
     cout << "=-------------------------------------------------------------------------------------=" << endl;
     cout << "Núm. total de trocas de contexto: " << this->context_switches << endl;
 
+    // Deleta os processos
     for (ProcessParams *p : this->stack_pointer)
     {
         delete p;
     }
 
+    // Limpa os vetores
     this->stack_pointer.clear();
     this->processesIds.clear();
 }
 
+// Verifica se algum processo perdeu o deadline ou se algum processo está pronto para ser executado
 void INE5412::check_processes_status()
 {
     for (ProcessParams *p : this->stack_pointer)
     {
-        if (p->get_deadline_time() == this->current_time && p->get_status() != "finished")
+        if (p->get_deadline_time() == this->current_time && p->is_finished() == false)
         {
-            // cout << "Process " << p->get_id() << " missed deadline" << endl;
             p->set_finish_time(this->current_time);
             p->set_status("finished");
         }
-        else if (p->get_creation_time() == this->current_time && p->get_status() == "new")
+        else if (p->get_creation_time() == this->current_time && p->is_new())
         {
             p->set_status("ready");
-            // cout << "Process " << p->get_id() << " is ready" << endl;
         }
     }
 }
 
+// Incrementa o tempo de espera dos processos que estão prontos
 void INE5412::check_waiting_time()
 {
     for (ProcessParams *p : this->stack_pointer)
     {
-        if (p->get_status() == "ready")
+        if (p->is_ready())
         {
             p->add_wait_time();
         }
     }
 }
 
+// Verifica se todos os processos terminaram
 bool INE5412::should_finish()
 {
     bool all_processes_finished = true;
     for (ProcessParams *p : this->stack_pointer)
     {
-        if (p->get_status() != "finished")
+        if (p->is_finished() == false)
         {
             all_processes_finished = false;
             break;
@@ -157,6 +153,7 @@ bool INE5412::should_finish()
     return all_processes_finished;
 }
 
+// Imprime o status dos processos no momento atual
 void INE5412::print_processes_status()
 {
 
@@ -180,14 +177,14 @@ void INE5412::print_processes_status()
         string status = "new";
         for (ProcessParams *p : this->stack_pointer)
         {
-            if (p->get_id() == id && p->get_status() == "ready")
+            if (p->get_id() == id && p->is_ready())
             {
-
                 status = "ready";
+                break;
             }
         }
 
-        if (id == this->program_counter->get_id())
+        if (this->program_counter != nullptr && id == this->program_counter->get_id())
         {
             cout << "  ##  ";
         }
@@ -204,12 +201,18 @@ void INE5412::print_processes_status()
     cout << endl;
 }
 
+// Muda o contexto do processo que está sendo executado
+void INE5412::change_context(ProcessParams *process)
+{
+    this->program_counter = process;
+    this->context_switches++;
+}
+
 void INE5412::start()
 {
     while (true)
     {
-
-        this->check_processes_status();
+        INE5412::check_processes_status();
 
         if (this->should_finish())
         {
@@ -218,40 +221,48 @@ void INE5412::start()
             break;
         }
 
-        ProcessParams *current_process = this->algorithm->select_process(this->stack_pointer);
-
-        if (current_process == nullptr && (this->program_counter == nullptr || this->program_counter->get_status() == "finished"))
+        // Se o processo atual terminou, seta o program counter para null
+        if (this->program_counter != nullptr && this->program_counter->is_finished())
         {
-            this->current_time++;
-            this->check_waiting_time();
-            sleep(1);
-            continue;
+            this->program_counter = nullptr;
         }
 
-        if (this->program_counter == nullptr || this->program_counter->get_status() == "finished")
-        {
-            this->program_counter = current_process;
-            this->context_switches++;
-        }
-        else if (current_process != nullptr)
-        {
-            int result_priority = this->algorithm->compare_and_return_priority_id(this->program_counter, current_process);
+        // Seleciona o processo a ser executado usando o algoritmo
+        ProcessParams *selected_process = this->algorithm->select_process(this->stack_pointer);
 
-            if (result_priority == current_process->get_id()) // deve alterar o processo em execução
+        // O algoritmo pode retornar null se não houver processos prontos para serem executados
+        if (selected_process != nullptr)
+        {
+            // Se o program counter for null, seta o program counter para o processo selecionado
+            if (this->program_counter == nullptr)
             {
-                this->program_counter->set_status("ready");
-                this->context_switches++;
-                this->program_counter = current_process;
+                INE5412::change_context(selected_process);
+            }
+            else
+            {
+                // Compara o processo atual com o processo selecionado para ver se o processo selecionado tem prioridade
+                int result_priority = this->algorithm->compare_and_return_priority_id(this->program_counter, selected_process);
+
+                // Se o processo selecionado tem prioridade, seta o program counter para o processo selecionado
+                if (result_priority == selected_process->get_id())
+                {
+                    // Muda o processo que estava executando para ready
+                    this->program_counter->set_status("ready");
+                    INE5412::change_context(selected_process);
+                }
             }
         }
 
-        this->program_counter->run(this->current_time);
+        // Se o program counter não for null, executa o processo
+        if (this->program_counter != nullptr)
+        {
+            this->program_counter->run(this->current_time);
+        }
 
         this->current_time++;
 
-        this->check_waiting_time();
+        INE5412::check_waiting_time();
+        INE5412::print_processes_status();
         sleep(1);
-
-        this->print_processes_status();
     }
 }
