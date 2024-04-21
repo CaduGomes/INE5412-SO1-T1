@@ -16,20 +16,18 @@ int main()
 	for (size_t i = 0; i < initial_size; i++)
 	{
 		ProcessParams process = original_process[i];
-		for (int i = 1; i < process.get_period_quantity(); i++)
+
+		if (process.get_period_quantity() > 1)
 		{
+			int new_creation_time = process.get_deadline_time();
 
-			if (i == 1)
-			{
-				int new_creation_time = i * process.get_deadline_time();
+			int new_deadline_time = new_creation_time + process.get_period_time();
 
-				int new_deadline_time = new_creation_time + process.get_period_time();
+			ProcessParams new_process(process, new_creation_time, new_deadline_time);
 
-				ProcessParams new_process(process, new_creation_time, new_deadline_time);
+			original_process.push_back(new_process);
 
-				original_process.push_back(new_process);
-			}
-			else
+			for (int j = 2; j < process.get_period_quantity(); j++)
 			{
 				int new_creation_time = original_process[original_process.size() - 1].get_creation_time() + process.get_period_time();
 
