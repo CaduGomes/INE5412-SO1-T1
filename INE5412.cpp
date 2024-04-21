@@ -29,34 +29,19 @@ INE5412::~INE5412()
         data[p->get_id()].media_espera += p->get_waiting_time();
         data[p->get_id()].deadlines += p->was_preemptive() ? 1 : 0;
         data[p->get_id()].count++;
-        // data
     }
 
     for (ProcessParams *p : this->stack_pointer)
     {
         double media_espera = data[p->get_id()].media_espera / data[p->get_id()].count;
         double turnaround_time = data[p->get_id()].turnaround_time / data[p->get_id()].count;
-
-        cout << data[p->get_id()].count << endl;
+        cout << "=-----------------------------------------------------------------------------------=" << endl;
 
         cout << "| P" << p->get_id() << " |         " << p->get_turnaround_time() << "        |            " << turnaround_time << "         |        " << media_espera << "          |      " << data[p->get_id()].deadlines << "     |" << endl;
     }
 
     cout << "=-----------------------------------------------------------------------------------=" << endl;
     cout << "Núm. total de trocas de contexto: " << this->context_switches << endl;
-
-    vector<ProcessParams *>::iterator iter = this->stack_pointer.begin();
-    for (iter = this->stack_pointer.begin(); iter < this->stack_pointer.end(); iter++)
-    {
-        delete *iter;
-    }
-
-    this->stack_pointer.clear();
-
-    if (this->program_counter != nullptr)
-    {
-        delete this->program_counter;
-    }
 }
 
 void INE5412::check_processes_status()
@@ -157,6 +142,7 @@ void INE5412::start()
         if (this->program_counter == nullptr || this->program_counter->get_status() == "finished")
         {
             this->program_counter = current_process;
+            this->context_switches++;
         }
         else if (current_process != nullptr)
         {
